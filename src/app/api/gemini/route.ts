@@ -17,7 +17,7 @@ export const preferredRegion = [
   'kix1',
 ];
 
-const GEMINI_HOST = 'generativelanguage.googleapis.com'
+const GEMINI_API = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent'
 
 const CORS_HEADERS: Record<string, string> = {
   'access-control-allow-origin': '*',
@@ -26,8 +26,9 @@ const CORS_HEADERS: Record<string, string> = {
 };
 
 export const GET = async () => {
-  const res = await fetch(`https://${GEMINI_HOST}`, {
+  const res = await fetch(GEMINI_API, {
     headers: {
+      ...CORS_HEADERS,
       'Content-Type': 'application/json',
     },
   });
@@ -44,7 +45,7 @@ export const OPTIONS = async () => {
 
 export const POST = async (request: NextRequest) => {
   const url = new URL(request.url);
-  const targetURL = request.url.replace(url.host, GEMINI_HOST);
+  const targetURL = new URL(`${GEMINI_API}${url.search}`);
   const body = await request.json();
 
   const response = await fetch(targetURL, {

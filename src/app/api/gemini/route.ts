@@ -17,18 +17,7 @@ export const preferredRegion = [
   'kix1',
 ];
 
-const pickHeaders = (headers: Headers, keys: (string | RegExp)[]): Headers => {
-  const picked = new Headers();
-  for (const key of headers.keys()) {
-    if (keys.some((k) => (typeof k === 'string' ? k === key : k.test(key)))) {
-      const value = headers.get(key);
-      if (typeof value === 'string') {
-        picked.set(key, value);
-      }
-    }
-  }
-  return picked;
-};
+const GEMINI_HOST = 'generativelanguage.googleapis.com'
 
 const CORS_HEADERS: Record<string, string> = {
   'access-control-allow-origin': '*',
@@ -36,39 +25,39 @@ const CORS_HEADERS: Record<string, string> = {
   'access-control-allow-headers': 'Content-Type',
 };
 
-export default async function handler(request: NextRequest & { nextUrl?: URL }) {
-  if (request.method === 'OPTIONS') {
-    return new Response(null, {
-      headers: CORS_HEADERS,
-    });
-  }
-
-  const { pathname, searchParams } = request.nextUrl ? request.nextUrl : new URL(request.url);
-
-  // curl \
-  // -H 'Content-Type: application/json' \
-  // -d '{ 'prompt': { 'text': 'Write a story about a magic backpack'} }' \
-  // 'https://generativelanguage.googleapis.com/v1beta3/models/text-bison-001:generateText?key={YOUR_KEY}'
-  const url = new URL(pathname, 'https://generativelanguage.googleapis.com');
-  searchParams.delete('_path');
-
-  searchParams.forEach((value, key) => {
-    url.searchParams.append(key, value);
+export const GET = async () => {
+  const res = await fetch(`https://${GEMINI_HOST}`, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
   });
+  const data = await res.json();
+ 
+  return Response.json({ data });
+}
 
-  const headers = pickHeaders(request.headers, ['content-type']);
+export const OPTIONS = async () => {
+  return new Response(null, {
+    headers: CORS_HEADERS,
+  });
+}
 
-  const response = await fetch(url, {
-    body: request.body,
+export const POST = async (request: NextRequest) => {
+  const url = new URL(request.url);
+  const targetURL = request.url.replace(url.host, GEMINI_HOST);
+  const body = await request.json();
+
+  const response = await fetch(targetURL, {
     method: request.method,
-    headers,
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: typeof body === 'object' ? JSON.stringify(body) : '{}',
   });
 
   const responseHeaders = {
     ...CORS_HEADERS,
-    ...Object.fromEntries(
-      pickHeaders(response.headers, ['content-type'])
-    ),
+    ...response.headers,
   };
 
   return new Response(response.body, {

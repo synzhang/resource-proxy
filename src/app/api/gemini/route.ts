@@ -25,14 +25,16 @@ const CORS_HEADERS: Record<string, string> = {
   'access-control-allow-headers': 'Content-Type',
 };
 
-export const GET = async () => {
-  const res = await fetch(GEMINI_API, {
+export const GET = async (request: NextRequest) => {
+  const url = new URL(request.url);
+  const targetURL = new URL(`${GEMINI_API}${url.search}`);
+  const response = await fetch(targetURL, {
     headers: {
       ...CORS_HEADERS,
       'Content-Type': 'application/json',
     },
   });
-  const data = await res.json();
+  const data = await response.json();
  
   return NextResponse.json({ data });
 }
@@ -47,7 +49,6 @@ export const POST = async (request: NextRequest) => {
   const url = new URL(request.url);
   const targetURL = new URL(`${GEMINI_API}${url.search}`);
   const body = await request.json();
-
   const response = await fetch(targetURL, {
     method: request.method,
     headers: {

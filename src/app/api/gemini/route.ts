@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 // 'nodejs' is the default
 export const runtime = 'edge';
@@ -33,11 +33,11 @@ export const GET = async () => {
   });
   const data = await res.json();
  
-  return Response.json({ data });
+  return NextResponse.json({ data });
 }
 
 export const OPTIONS = async () => {
-  return new Response(null, {
+  return new NextResponse(null, {
     headers: CORS_HEADERS,
   });
 }
@@ -60,7 +60,7 @@ export const POST = async (request: NextRequest) => {
     ...response.headers,
   };
 
-  return new Response(response.body, {
+  return new NextResponse(response.body, {
     headers: responseHeaders,
     status: response.status
   });

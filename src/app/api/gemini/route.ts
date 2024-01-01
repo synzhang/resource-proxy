@@ -17,53 +17,67 @@ export const preferredRegion = [
   'kix1',
 ];
 
-const GEMINI_API = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent'
-
+const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com'
 const CORS_HEADERS: Record<string, string> = {
   'access-control-allow-origin': '*',
   'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
   'access-control-allow-headers': 'Content-Type',
 };
+const COMMON_HEADERS: Record<string, string> = {
+  ...CORS_HEADERS,
+  'Cache-Control': 'no-store',
+};
+
+const buildURL = (request: NextRequest) => {
+  const path = `${request.nextUrl.pathname}`.replaceAll('/api/gemini/', '');
+
+  return `${GEMINI_BASE_URL}/${path}`;
+};
 
 export const GET = async (request: NextRequest) => {
-  const url = new URL(request.url);
-  const targetURL = new URL(`${GEMINI_API}${url.search}`);
-  const response = await fetch(targetURL, {
+  const url = buildURL(request);
+  const response = await fetch(url, {
     headers: {
-      ...CORS_HEADERS,
       'Content-Type': 'application/json',
     },
   });
   const data = await response.json();
  
-  return NextResponse.json({ data });
-}
+  return NextResponse.json({ data }, {
+    headers: COMMON_HEADERS,
+    status: 200,
+  });
+};
 
 export const OPTIONS = async () => {
-  return new NextResponse(null, {
-    headers: CORS_HEADERS,
+  return NextResponse.json({ body: 'OK' }, {
+    headers: COMMON_HEADERS,
+    status: 200,
   });
-}
+};
 
 export const POST = async (request: NextRequest) => {
-  const url = new URL(request.url);
-  const targetURL = new URL(`${GEMINI_API}${url.search}`);
-  const body = await request.json();
-  const response = await fetch(targetURL, {
-    method: request.method,
+  const url = buildURL(request);
+  const options: RequestInit = {
     headers: {
       'Content-Type': 'application/json'
     },
-    body: typeof body === 'object' ? JSON.stringify(body) : '{}',
-  });
-
+    method: request.method,
+    body: request.body,
+    redirect: 'manual',
+    // @ts-ignore
+    duplex: 'half',
+  };
+  const response = await fetch(url, options);
   const responseHeaders = {
     ...CORS_HEADERS,
     ...response.headers,
+    'X-Accel-Buffering': 'no',
   };
 
   return new NextResponse(response.body, {
     headers: responseHeaders,
-    status: response.status
+    status: response.status,
+    statusText: response.statusText,
   });
-}
+};

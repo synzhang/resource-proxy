@@ -19,9 +19,10 @@ export const preferredRegion = [
 
 const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com'
 const CORS_HEADERS: Record<string, string> = {
-  'access-control-allow-origin': '*',
-  'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'access-control-allow-headers': 'Content-Type',
+  'Access-Control-Allow-Credentials': 'true',
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': '*',
+  'Access-Control-Allow-Headers': '*',
 };
 const COMMON_HEADERS: Record<string, string> = {
   ...CORS_HEADERS,
@@ -61,7 +62,8 @@ export const POST = async (request: NextRequest) => {
   const url = buildURL(request);
   const options: RequestInit = {
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-store',
     },
     method: request.method,
     body: request.body,

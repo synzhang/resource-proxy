@@ -60,13 +60,14 @@ export const OPTIONS = async () => {
 
 export const POST = async (request: NextRequest) => {
   const url = buildURL(request);
+  const body = await request.json()
   const options: RequestInit = {
     headers: {
       'Content-Type': 'application/json',
       'Cache-Control': 'no-store',
     },
     method: request.method,
-    body: request.body,
+    body: typeof body === 'object' ? JSON.stringify(body) : null,
     redirect: 'manual',
     // @ts-ignore
     duplex: 'half',

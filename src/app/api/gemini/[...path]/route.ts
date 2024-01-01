@@ -30,8 +30,9 @@ const COMMON_HEADERS: Record<string, string> = {
 
 const buildURL = (request: NextRequest) => {
   const path = `${request.nextUrl.pathname}`.replaceAll('/api/gemini/', '');
+  const search = request.nextUrl.search
 
-  return `${GEMINI_BASE_URL}/${path}`;
+  return `${GEMINI_BASE_URL}/${path}${search}`;
 };
 
 export const GET = async (request: NextRequest) => {

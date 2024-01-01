@@ -26,7 +26,7 @@ const CORS_HEADERS: Record<string, string> = {
 };
 const COMMON_HEADERS: Record<string, string> = {
   ...CORS_HEADERS,
-  'Cache-Control': 'no-store',
+  // 'Cache-Control': 'no-store',
 };
 
 const buildURL = (request: NextRequest) => {
@@ -64,19 +64,19 @@ export const POST = async (request: NextRequest) => {
   const options: RequestInit = {
     headers: {
       'Content-Type': 'application/json',
-      'Cache-Control': 'no-store',
+      // 'Cache-Control': 'no-store',
     },
     method: request.method,
     body: typeof body === 'object' ? JSON.stringify(body) : null,
-    redirect: 'manual',
+    // redirect: 'manual',
     // @ts-ignore
-    duplex: 'half',
+    // duplex: 'half',
   };
   const response = await fetch(url, options);
   const responseHeaders = {
     ...CORS_HEADERS,
     ...response.headers,
-    'X-Accel-Buffering': 'no',
+    // 'X-Accel-Buffering': 'no',
   };
 
   return new NextResponse(response.body, {

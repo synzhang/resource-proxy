@@ -17,7 +17,7 @@ export const preferredRegion = [
   'kix1',
 ];
 
-const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com'
+const GOOGLE_BASE_URL = 'https://generativelanguage.googleapis.com'
 const CORS_HEADERS: Record<string, string> = {
   'Access-Control-Allow-Credentials': 'true',
   'Access-Control-Allow-Origin': '*',
@@ -31,10 +31,10 @@ const COMMON_HEADERS: Record<string, string> = {
 
 const buildURL = (request: NextRequest) => {
   const url = new URL(request.nextUrl);
-  const path = `${request.nextUrl.pathname}`.replaceAll('/api/gemini/', '');
+  const path = `${request.nextUrl.pathname}`.replaceAll('/api/google/', '');
   const key = url.searchParams.get('key');
 
-  return `${GEMINI_BASE_URL}/${path}?key=${key}`;
+  return `${GOOGLE_BASE_URL}/${path}?key=${key}`;
 };
 
 export const GET = async (request: NextRequest) => {

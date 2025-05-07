@@ -1,40 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
+import {
+  CORS_HEADERS,
+  COMMON_HEADERS,
+  GEMINI_BASE_URL,
+  preferredRegion,
+} from '@/utils'
 
 // 'nodejs' is the default
 export const runtime = 'edge';
 
-// Available languages and regions for Google AI Studio and Gemini API
-// https://ai.google.dev/available_regions
-// https://vercel.com/docs/concepts/edge-network/regions
-export const preferredRegion = [
-  'cle1',
-  'iad1',
-  'pdx1',
-  'sfo1',
-  'sin1',
-  'syd1',
-  'hnd1',
-  'kix1',
-];
-
-const GOOGLE_BASE_URL = 'https://generativelanguage.googleapis.com'
-const CORS_HEADERS: Record<string, string> = {
-  'Access-Control-Allow-Credentials': 'true',
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': '*',
-  'Access-Control-Allow-Headers': '*',
-};
-const COMMON_HEADERS: Record<string, string> = {
-  ...CORS_HEADERS,
-  'Cache-Control': 'no-store',
-};
+export { preferredRegion };
 
 const buildURL = (request: NextRequest) => {
   const url = new URL(request.nextUrl);
   const path = `${request.nextUrl.pathname}`.replaceAll('/api/google/', '');
   const key = url.searchParams.get('key');
 
-  return `${GOOGLE_BASE_URL}/${path}?key=${key}`;
+  return `${GEMINI_BASE_URL}/${path}?key=${key}`;
 };
 
 export const GET = async (request: NextRequest) => {
@@ -45,7 +27,7 @@ export const GET = async (request: NextRequest) => {
     },
   });
   const data = await response.json();
- 
+
   return NextResponse.json({ data }, {
     headers: COMMON_HEADERS,
     status: 200,
